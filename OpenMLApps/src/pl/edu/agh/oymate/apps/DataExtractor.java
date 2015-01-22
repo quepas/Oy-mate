@@ -24,14 +24,14 @@ public class DataExtractor {
 
         int data_id = ConsoleIO.inputInt("Enter data id: ");
         ConsoleIO.puts("Donwload data with id " + data_id + "!");
-        /*for (int data_id = 1229; data_id <= 1320; ++data_id) {
-            try {
-                DataSetDescription dataSet = client.openmlDataGet(data_id);
-                ConsoleIO.puts(dataSet.getDataset(sessionHash).getAbsolutePath());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }*/
+        try {
+            DataSetDescription dataSet = client.openmlDataGet(data_id);
+            String sessionHash = client.getSessionHash();
+            ConsoleIO.puts(dataSet.getDataset(sessionHash).getAbsolutePath());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         ConsoleIO.puts("Inspect data with id " + data_id + "!");
         try {
             ConsoleIO.puts("---------- DataSetDescription ----------");
