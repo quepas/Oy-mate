@@ -96,4 +96,28 @@ public class OpenMLViewer {
         ConsoleIO.puts("\t\tInterval end: " + quality.getInterval_end());
     }
 
+    public static void display(Task task) {
+        ConsoleIO.puts("Oml: " + task.getOml());
+        ConsoleIO.puts("Task ID: " + task.getTask_id());
+        ConsoleIO.puts("Task Type: " + task.getTask_type());
+        Task.Input[] inputs = task.getInputs();
+        for (int i = 0; i < inputs.length; ++i) {
+            ConsoleIO.puts("\t" + (i + 1) + ": " + inputs[i].getName());
+        }
+        Task.Output[] outputs = task.getOutputs();
+        for (int i = 0; i < outputs.length; ++i) {
+            ConsoleIO.puts("\t" + (i+1) + ": " + outputs[i].getName());
+            display(outputs[i].getPredictions());
+        }
+    }
+
+    public static void display(Task.Output.Predictions predictions) {
+        ConsoleIO.puts("-------------- Predictions ---------------");
+        ConsoleIO.puts("\tFormat: " + predictions.getFormat());
+        Task.Output.Predictions.Feature[] features = predictions.getFeatures();
+        for (int i = 0; i < features.length; ++i) {
+            ConsoleIO.puts("\t\t" + features[i].getName() + " : " + features[i].getType());
+        }
+    }
+
 }
