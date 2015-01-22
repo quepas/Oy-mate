@@ -41,7 +41,7 @@ public class OpenMLViewer {
         ConsoleIO.puts("\tCreator: " + Arrays.toString(dataSetDescription.getCreator()));
         ConsoleIO.puts("\tID: " + dataSetDescription.getId());
         ConsoleIO.puts("\tIgnore attribute: " + Arrays.toString(dataSetDescription.getIgnore_attribute()));
-        ConsoleIO.puts("\tTag: " + Arrays.toString(dataSetDescription.getTag()));
+        //ConsoleIO.puts("\tTag: " + Arrays.toString(dataSetDescription.getTag()));
     }
 
     public static void display(DataFeature dataFeature) {

@@ -1,9 +1,9 @@
-package pl.edu.agh.oymate;
+package pl.edu.agh.oymate.apps;
 
-import org.openml.apiconnector.io.ApiException;
 import org.openml.apiconnector.io.OpenmlConnector;
 import org.openml.apiconnector.xml.*;
 import pl.edu.agh.oymate.helper.ConsoleIO;
+import pl.edu.agh.oymate.helper.OpenMLUtil;
 import pl.edu.agh.oymate.helper.OpenMLViewer;
 
 /**
@@ -13,20 +13,7 @@ public class DataExtractor {
 
     public static void main(String[] args) {
         ConsoleIO.puts("=== OpenML Data Extractor ===");
-        ConsoleIO.puts("Login into OpenML!");
-        String login = ConsoleIO.input("\tEnter login: ");
-        String password = ConsoleIO.inputSecure("\tEnter password: ");
-
-        OpenmlConnector client = new OpenmlConnector(login, password);
-        try {
-            ConsoleIO.puts("Session info!");
-            OpenMLViewer.display(client.openmlAuthenticate());
-        } catch (ApiException ex) {
-            ConsoleIO.puts("Login error!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
+        OpenmlConnector client = OpenMLUtil.authorizeUserAndConnect();
         ConsoleIO.puts("OpenML inner data! All data qualities!");
         try {
             DataQualityList dataQualityList = client.openmlDataQualityList();
@@ -36,6 +23,15 @@ public class DataExtractor {
         }
 
         int data_id = ConsoleIO.inputInt("Enter data id: ");
+        ConsoleIO.puts("Donwload data with id " + data_id + "!");
+        /*for (int data_id = 1229; data_id <= 1320; ++data_id) {
+            try {
+                DataSetDescription dataSet = client.openmlDataGet(data_id);
+                ConsoleIO.puts(dataSet.getDataset(sessionHash).getAbsolutePath());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }*/
         ConsoleIO.puts("Inspect data with id " + data_id + "!");
         try {
             ConsoleIO.puts("---------- DataSetDescription ----------");
