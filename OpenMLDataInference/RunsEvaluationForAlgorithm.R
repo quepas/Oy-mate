@@ -25,14 +25,23 @@ init <- function() {
 go <- function() {
   impl <- "^weka.J48.*$"
   for (idx in 1:max_tasks) {
-    good_runs <- list_runs_results(runs_results[[idx]], impl)
+    evaluation <- list_tasks_with_good_runs(runs_results[[idx]], impl)
+    percent <- evaluation[1]
+    if (!is.nan(percent) && percent > 0.0) {
+      cat(sprintf("Task_id: %d [%f%% (%d)]\n", tasks[idx,1], percent, evaluation[2]))
+    }
   }
 }
 
-list_runs_results <- function(run_result, implementation_regexp) {
+list_tasks_with_good_runs <- function(run_result, implementation_regexp) {
+  good_percent <- NaN
+  filtered_runs <- list()
+  all_runs <- list()
   if (ncol(run_result) > 5) {
+    all_runs <- run_result[grepl(implementation_regexp, run_result[,4]),]
     filtered_runs <- run_result[grepl(implementation_regexp, run_result[,4]) & run_result[,8] > roc_threshold, ]
-    print(nrow(filtered_runs))
-    filtered_runs[,1]  
+    good_percent <- (nrow(filtered_runs) / nrow(all_runs)) * 100
   }
+  c(good_percent, nrow(all_runs))
 }
+
