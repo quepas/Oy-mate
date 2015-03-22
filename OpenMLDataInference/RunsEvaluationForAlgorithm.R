@@ -24,13 +24,17 @@ init <- function() {
 
 go <- function() {
   impl <- "^weka.J48.*$"
+  idxs <- c()
   for (idx in 1:max_tasks) {
     evaluation <- list_tasks_with_good_runs(runs_results[[idx]], impl)
     percent <- evaluation[1]
     if (!is.nan(percent) && percent > 0.0) {
-      cat(sprintf("Task_id: %d [%f%% (%d)]\n", tasks[idx,1], percent, evaluation[2]))
+      cat(sprintf("Task_id: %d [%f%% (%d)], data set: %s\n", tasks[idx,1], percent, evaluation[2], tasks[idx,5]))
+      idxs <- c(idxs, idx)
     }
   }
+  print(idxs)
+  print(tasks[idxs, c(6, 8, 9, 10, 11, 12, 13, 14)]) # write this to arff file
 }
 
 list_tasks_with_good_runs <- function(run_result, implementation_regexp) {
