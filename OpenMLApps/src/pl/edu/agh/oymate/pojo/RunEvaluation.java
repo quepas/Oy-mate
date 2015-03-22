@@ -5,8 +5,8 @@ package pl.edu.agh.oymate.pojo;
  */
 public class RunEvaluation {
     public String function;
-    public double value;
-    public double stddev;
+    public Double value;
+    public Double stddev;
     // String for now
     public String array_data;
 }
