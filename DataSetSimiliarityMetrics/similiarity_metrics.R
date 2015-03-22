@@ -2,7 +2,7 @@ library("foreign")
 library("proxy")
 
 iris <- read.arff("data/iris.arff")
-iris2d <- read.arff("data/iris.2D.arff")
+#iris2d <- read.arff("data/iris.2D.arff")
 
 find_similiar_dataset <- function(base_ds, directory) {
   file_names <- list.files(directory, pattern="\\.arff$")
@@ -13,13 +13,19 @@ find_similiar_dataset <- function(base_ds, directory) {
   winner <- "NA"
   for (name in file_names) {
     print(name)
-    ds <- read.arff(paste(directory, name, sep="\\"))
-    simil_metrics <- compare_datasets(base, ds)
-    if (simil_metrics > max_simil) {
-      max_simil <- simil_metrics
-      winner <- name
-    }
-    cat(sprintf("Comparing with %s: %f\n", toString(name), simil_metrics))
+    tryCatch({
+      ds <- read.arff(paste(directory, name, sep="\\"))
+      simil_metrics <- compare_datasets(base, ds)
+      if (simil_metrics > max_simil) {
+        max_simil <- simil_metrics
+        winner <- name
+      }
+      cat(sprintf("Comparing with %s: %f\n", toString(name), simil_metrics))
+    },
+    error = function(err) {
+      file.remove(paste(directory, name, sep="\\"))
+    },
+    finally = {})    
   }
   cat("\nWinner is", winner, "with", toString(max_simil))
 }
