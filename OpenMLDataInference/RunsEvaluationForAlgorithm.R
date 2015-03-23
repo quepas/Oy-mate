@@ -4,7 +4,7 @@ init <- function() {
   max_tasks <<- 200
   only_max_tasks <- FALSE
   session.hash = authenticateUser(username = "openml.rteam@gmail.com", password = "testpassword")
-  tasks <<- listOMLTasks(1)
+  tasks <<- GetTasks("Supervised Classification")
   runs_results <<- list()
   counter <- 1
   runs_so_far <- 0
@@ -28,7 +28,6 @@ init_thresholds <- function() {
 }
 
 go <- function() {
-  #impl <- "^weka.J48.*$"
   impl <- "^weka.J48.*$"
   idxs <- c()
   for (idx in 1:length(runs_results)) {
@@ -58,9 +57,8 @@ list_tasks_with_good_runs <- function(run_result, implementation_regexp) {
 # taskTypeName == "Supervised Classification"
 GetTasks <- function(taskTypeName) {
   taskTypes <- listOMLTaskTypes()
-  type.id <- with(taskTypes, id[name = taskTypeName])
+  type.id <- with(taskTypes, id[name == taskTypeName])
   tasks <- listOMLTasks(type = type.id)
-  tasks
 }
 
 FilterResultsByName <- function(results, implementation.name) {
