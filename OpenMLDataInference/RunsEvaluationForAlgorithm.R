@@ -28,13 +28,13 @@ init_thresholds <- function() {
 }
 
 go <- function() {
-  impl <- "^weka.J48.*$"
+  name <- "^weka.J48.*$"
   idxs <- c()
   for (idx in 1:length(runs_results)) {
-    evaluation <- list_tasks_with_good_runs(runs_results[[idx]], impl)
+    evaluation <- FilterResult(runs_results[[idx]], name)
     percent <- evaluation[1]
     if (!is.nan(percent) && percent > 0.0) {
-      cat(sprintf("Task_id: %d [%f%% (%d)], data set: %s\n", tasks[idx,1], percent, evaluation[2], tasks[idx,5]))
+      cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", tasks[idx,1], percent, evaluation[2], evaluation[3], tasks[idx,5]))
       idxs <- c(idxs, idx)
     }
   }
@@ -42,29 +42,31 @@ go <- function() {
   #print(tasks[idxs, c(6, 8, 9, 10, 11, 12, 13, 14)]) # write this to arff file
 }
 
-list_tasks_with_good_runs <- function(run_result, implementation_regexp) {
-  good_percent <- NaN
-  filtered_runs <- list()
-  all_runs <- list()
-  if (ncol(run_result) > 5) {
-    all_runs <- run_result[grepl(implementation_regexp, run_result[,4]),]
-    filtered_runs <- run_result[grepl(implementation_regexp, run_result[,4]) & run_result[,8] > roc_threshold, ]
-    good_percent <- (nrow(filtered_runs) / nrow(all_runs)) * 100
-  }
-  c(good_percent, nrow(all_runs))
+FilterResult <- function(result, name) {
+  percent <- NaN
+  numAllRuns <- 0
+  numGoodRuns <- 0
+  if (nrow(result) != 0) {
+    filtered_runs <- FilterResultsByName(result, name)
+    numAllRuns <- nrow(filtered_runs)
+    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.98, 1)
+    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.99, 1)
+    numGoodRuns <- nrow(filtered_runs)
+    percent <- (numGoodRuns / numAllRuns) * 100
+  } 
+  c(percent, numGoodRuns, numAllRuns)
 }
 
-# taskTypeName == "Supervised Classification"
 GetTasks <- function(taskTypeName) {
   taskTypes <- listOMLTaskTypes()
   type.id <- with(taskTypes, id[name == taskTypeName])
   tasks <- listOMLTasks(type = type.id)
 }
 
-FilterResultsByName <- function(results, implementation.name) {
-  results[grepl(implementation.name, results[, 4]), ]
+FilterResultsByName <- function(results, name) {
+  subset(results, grepl(name, implementation))
 }
 
-FilterResultsByEvaluation <- function(results, metrics.num, metrics.min, metrics.max) {
-  results[results[, metrics.num] >= metrics.min & results[, metrics.num] <= metrics.max, ]
+FilterResultsByEvaluation <- function(results, metrics, min, max) {
+  subset(results, eval(parse(text=metrics)) >= min & eval(parse(text=metrics)) <= max)
 }
