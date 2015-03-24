@@ -1,4 +1,5 @@
 library(OpenML)
+library(foreign)
 
 init <- function() {
   max_tasks <<- 200
@@ -28,18 +29,46 @@ init_thresholds <- function() {
 }
 
 go <- function() {
-  name <- "^weka.J48.*$"
-  idxs <- c()
-  for (idx in 1:length(runs_results)) {
-    evaluation <- FilterResult(runs_results[[idx]], name)
-    percent <- evaluation[1]
+  dataSet <- data.frame()
+  print("---- weka.OneR ----")
+  idxs <- GetResultsWithCriteria(runs_results, "^weka.OneR\\(.*\\)$")
+  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "OneR"))
+  print("---- weka.ZeroR ----")
+  idxs <- GetResultsWithCriteria(runs_results, "^weka.ZeroR\\(.*\\)$")
+  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "ZeroR"))
+  print("---- weka.J48 ----")
+  idxs <- GetResultsWithCriteria(runs_results, "^weka.J48\\(.*\\)$")
+  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "J48"))
+  print("---- weka.NaiveBayes ----")
+  idxs <- GetResultsWithCriteria(runs_results, "^weka.NaiveBayes\\(.*\\)$")
+  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "NaiveBayes"))
+  print("---- weka.Logistic ----")
+  idxs <- GetResultsWithCriteria(runs_results, "^weka.Logistic\\(.*\\)$")
+  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "Logistic"))
+  write.arff(dataSet, "DataSet.arff")
+}
+
+# in:
+#     results - array of runs results
+#     name - name of algorithm (as regexp)
+GetResultsWithCriteria <- function(runs, name) {
+  idxs <- list()
+  for (i in 1:length(runs)) {
+    result <- FilterResult(runs[[i]], name)
+    percent <- result[1]
     if (!is.nan(percent) && percent > 0.0) {
-      cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", tasks[idx,1], percent, evaluation[2], evaluation[3], tasks[idx,5]))
-      idxs <- c(idxs, idx)
+      cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", tasks[i, 1], percent, result[2], result[3], tasks[i, 5]))
+      idxs <- c(idxs, i)
     }
   }
-  print(idxs)
-  #print(tasks[idxs, c(6, 8, 9, 10, 11, 12, 13, 14)]) # write this to arff file
+  idxs
+}
+
+PrepareDataSetChunk <- function(tasks, idxs, class) {
+  columns <- c(8:14)
+  data_to_write <- tasks[unlist(idxs), columns]
+  classes <- data.frame(class=rep(class, nrow(data_to_write)))
+  data.frame(data_to_write, classes)
 }
 
 FilterResult <- function(result, name) {
@@ -50,7 +79,8 @@ FilterResult <- function(result, name) {
     filtered_runs <- FilterResultsByName(result, name)
     numAllRuns <- nrow(filtered_runs)
     filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.98, 1)
-    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.99, 1)
+    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.98, 1)
+    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "precision", 0.95, 1)
     numGoodRuns <- nrow(filtered_runs)
     percent <- (numGoodRuns / numAllRuns) * 100
   } 
