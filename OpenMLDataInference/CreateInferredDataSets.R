@@ -1,5 +1,14 @@
 library(OpenML)
 library(foreign)
+library(plyr)
+
+InitDataSetQualities <- function() {
+  dataSetQualities <<- list()
+  allDataSet <<- listOMLDataSets()
+  for (i in allDataSet[, 1]) {
+    dataSetQualities[[i]] <<- PrepareDataSetQualities(listOMLDataSetQualities(i))
+  }
+}
 
 init <- function() {
   max_tasks <<- 200
@@ -30,21 +39,27 @@ init_thresholds <- function() {
 
 go <- function() {
   dataSet <- data.frame()
+  unique_idxs <- c()
   print("---- weka.OneR ----")
   idxs <- GetResultsWithCriteria(runs_results, "^weka.OneR\\(.*\\)$")
-  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "OneR"))
+  unique_idxs <- idxs
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, unique_idxs, "OneR"))
   print("---- weka.ZeroR ----")
   idxs <- GetResultsWithCriteria(runs_results, "^weka.ZeroR\\(.*\\)$")
-  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "ZeroR"))
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "ZeroR"))
+  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.J48 ----")
   idxs <- GetResultsWithCriteria(runs_results, "^weka.J48\\(.*\\)$")
-  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "J48"))
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "J48"))
+  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.NaiveBayes ----")
   idxs <- GetResultsWithCriteria(runs_results, "^weka.NaiveBayes\\(.*\\)$")
-  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "NaiveBayes"))
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "NaiveBayes"))
+  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.Logistic ----")
   idxs <- GetResultsWithCriteria(runs_results, "^weka.Logistic\\(.*\\)$")
-  dataSet <- rbind(dataSet, PrepareDataSetChunk(tasks, idxs, "Logistic"))
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "Logistic"))
+  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   write.arff(dataSet, "DataSet.arff")
 }
 
@@ -65,10 +80,13 @@ GetResultsWithCriteria <- function(runs, name) {
 }
 
 PrepareDataSetChunk <- function(tasks, idxs, class) {
-  columns <- c(8:14)
-  data_to_write <- tasks[unlist(idxs), columns]
-  classes <- data.frame(class=rep(class, nrow(data_to_write)))
-  data.frame(data_to_write, classes)
+  dataSetIndxs <- tasks[unlist(idxs), 3]
+  result <- data.frame()
+  for (i in dataSetIndxs) {
+    result <- rbind.fill(result, dataSetQualities[[i]])
+  }
+  classes <- data.frame(class=rep(class, nrow(result)))
+  data.frame(result, classes)
 }
 
 FilterResult <- function(result, name) {
@@ -78,9 +96,9 @@ FilterResult <- function(result, name) {
   if (nrow(result) != 0) {
     filtered_runs <- FilterResultsByName(result, name)
     numAllRuns <- nrow(filtered_runs)
-    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.98, 1)
-    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.98, 1)
-    #filtered_runs <- FilterResultsByEvaluation(filtered_runs, "precision", 0.95, 1)
+    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.99, 1)
+    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.99, 1)
+    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "precision", 0.99, 1)
     numGoodRuns <- nrow(filtered_runs)
     percent <- (numGoodRuns / numAllRuns) * 100
   } 
@@ -99,4 +117,12 @@ FilterResultsByName <- function(results, name) {
 
 FilterResultsByEvaluation <- function(results, metrics, min, max) {
   subset(results, eval(parse(text=metrics)) >= min & eval(parse(text=metrics)) <= max)
+}
+
+PrepareDataSetQualities <- function(qvals) {
+  qnames <- qvals[[1]]
+  data <- data.frame(matrix(dat=NA, ncol = length(qnames), nrow = 0))
+  colnames(data) <- qnames
+  data[1, ] <- qvals[[2]]
+  data
 }
