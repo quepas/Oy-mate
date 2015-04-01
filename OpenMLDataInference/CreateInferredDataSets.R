@@ -29,7 +29,7 @@ LoadOMLDataSetsQualities <- function(dataSets) {
   qualities
 }
 
-# Loading run results for given tasks
+# Loading all run results for given tasks
 LoadOMLTaskResults <- function(tasks) {
   results <- list()
   index <- 1
@@ -37,6 +37,19 @@ LoadOMLTaskResults <- function(tasks) {
     results[[index]] <- listOMLRunResults(taskID)
     index <- index + 1
   }
+  results
+}
+
+# Loading run results for given tasks range
+LoadOMLTaskResults <- function(tasks, from, to) {
+  results <- list()
+  index <- 1
+  for (i in from:to) {
+    if (i > nrow(tasks)) break
+    results[[index]] <- listOMLRunResults(tasks[i, 1]);
+    index <- index + 1
+  }
+  results
 }
 
 go <- function() {
