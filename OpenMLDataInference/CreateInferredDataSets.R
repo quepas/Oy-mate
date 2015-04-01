@@ -2,39 +2,41 @@ library(OpenML)
 library(foreign)
 library(plyr)
 
-InitDataSetQualities <- function() {
-  dataSetQualities <<- list()
-  allDataSet <<- listOMLDataSets()
-  for (i in allDataSet[, 1]) {
-    dataSetQualities[[i]] <<- PrepareDataSetQualities(listOMLDataSetQualities(i))
-  }
+# Loading all needed OML data into global env.
+LoadOMLDataIntoGlobalEnv <- function() {
+  session.hash <<- authenticateUser(username = "openml.rteam@gmail.com", password = "testpassword")
+
+  globalTasks <<- LoadOMLTasks("Supervised Classification")
+  globalDataSets <<- listOMLDataSets()
+  globalQualities <<- LoadOMLDataSetsQualities(globalDataSets)
+  globalResults <<- LoadOMLTaskResults(globalTasks)
 }
 
-init <- function() {
-  max_tasks <<- 200
-  only_max_tasks <- FALSE
-  session.hash = authenticateUser(username = "openml.rteam@gmail.com", password = "testpassword")
-  tasks <<- GetTasks("Supervised Classification")
-  runs_results <<- list()
-  counter <- 1
-  runs_so_far <- 0
-  for (task_id in tasks[,1]) {
-    runs_results[[counter]] <<- listOMLRunResults(task_id)
-    rows <- nrow(runs_results[[counter]])
-    print(rows)
-    print("Runs so far: ")
-    runs_so_far <- runs_so_far + rows
-    print(runs_so_far)
-    counter <- counter + 1
-    if (counter > max_tasks && only_max_tasks) {
-      break
-    }
-  }
-  roc_threshold <<- 0.98
+# Loading all tasks with given type (ex. "Supervised Classification")
+LoadOMLTasks <- function(taskTypeName) {
+  taskTypes <- listOMLTaskTypes()
+  type.id <- with(taskTypes, id[name == taskTypeName])
+  tasks <- listOMLTasks(type = type.id)
+  tasks
 }
 
-init_thresholds <- function() {
-  roc_threshold <<- 0.98
+# Loading qualities for given data sets
+LoadOMLDataSetsQualities <- function(dataSets) {
+  qualities <- list()
+  for (dataSetID in dataSets[, 1]) {
+    qualities[[dataSetID]] <- PrepareDataSetQualities(listOMLDataSetQualities(dataSetID))
+  }
+  qualities
+}
+
+# Loading run results for given tasks
+LoadOMLTaskResults <- function(tasks) {
+  results <- list()
+  index <- 1
+  for (taskID in tasks[, 1]) {
+    results[[index]] <- listOMLRunResults(taskID)
+    index <- index + 1
+  }
 }
 
 go <- function() {
@@ -103,12 +105,6 @@ FilterResult <- function(result, name) {
     percent <- (numGoodRuns / numAllRuns) * 100
   } 
   c(percent, numGoodRuns, numAllRuns)
-}
-
-GetTasks <- function(taskTypeName) {
-  taskTypes <- listOMLTaskTypes()
-  type.id <- with(taskTypes, id[name == taskTypeName])
-  tasks <- listOMLTasks(type = type.id)
 }
 
 FilterResultsByName <- function(results, name) {
