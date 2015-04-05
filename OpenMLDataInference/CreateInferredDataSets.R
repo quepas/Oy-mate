@@ -56,24 +56,24 @@ go <- function() {
   dataSet <- data.frame()
   unique_idxs <- c()
   print("---- weka.OneR ----")
-  idxs <- GetResultsWithCriteria(runs_results, "^weka.OneR\\(.*\\)$")
+  idxs <- GetResultsWithCriteria(globalResults, "^weka.OneR\\(.*\\)$")
   unique_idxs <- idxs
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, unique_idxs, "OneR"))
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, unique_idxs, "OneR"))
   print("---- weka.ZeroR ----")
-  idxs <- GetResultsWithCriteria(runs_results, "^weka.ZeroR\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "ZeroR"))
+  idxs <- GetResultsWithCriteria(globalResults, "^weka.ZeroR\\(.*\\)$")
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "ZeroR"))
   unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.J48 ----")
-  idxs <- GetResultsWithCriteria(runs_results, "^weka.J48\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "J48"))
+  idxs <- GetResultsWithCriteria(globalResults, "^weka.J48\\(.*\\)$")
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "J48"))
   unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.NaiveBayes ----")
-  idxs <- GetResultsWithCriteria(runs_results, "^weka.NaiveBayes\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "NaiveBayes"))
+  idxs <- GetResultsWithCriteria(globalResults, "^weka.NaiveBayes\\(.*\\)$")
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "NaiveBayes"))
   unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   print("---- weka.Logistic ----")
-  idxs <- GetResultsWithCriteria(runs_results, "^weka.Logistic\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(tasks, setdiff(idxs, unique_idxs), "Logistic"))
+  idxs <- GetResultsWithCriteria(globalResults, "^weka.Logistic\\(.*\\)$")
+  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "Logistic"))
   unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
   write.arff(dataSet, "DataSet.arff")
 }
@@ -87,7 +87,7 @@ GetResultsWithCriteria <- function(runs, name) {
     result <- FilterResult(runs[[i]], name)
     percent <- result[1]
     if (!is.nan(percent) && percent > 0.0) {
-      cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", tasks[i, 1], percent, result[2], result[3], tasks[i, 5]))
+      cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", globalTasks[i, 1], percent, result[2], result[3], globalTasks[i, 5]))
       idxs <- c(idxs, i)
     }
   }
@@ -98,7 +98,7 @@ PrepareDataSetChunk <- function(tasks, idxs, class) {
   dataSetIndxs <- tasks[unlist(idxs), 3]
   result <- data.frame()
   for (i in dataSetIndxs) {
-    result <- rbind.fill(result, dataSetQualities[[i]])
+    result <- rbind.fill(result, globalQualities[[i]])
   }
   classes <- data.frame(class=rep(class, nrow(result)))
   data.frame(result, classes)
