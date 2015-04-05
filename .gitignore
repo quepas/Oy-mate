@@ -21,3 +21,4 @@ hs_err_pid*
 # RStudio
 .Rhistory
 .Rproj.user
+*.RData
