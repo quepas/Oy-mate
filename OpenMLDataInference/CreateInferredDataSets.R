@@ -62,13 +62,29 @@ SetupExperimentGlobalEnv <- function() {
   algorithmsCriteria[[5]] <<- c("weka.Logistic", "^weka.Logistic\\(.*\\)$")
 }
 
-go <- function() {
+CreateRunsCriteriaA <- function() {
+  criteria <- list()
+  criteria[[1]] <- list("area.under.roc.curve", 0.98, 1)
+  criteria
+}
+
+CreateRunsCriteriaB <- function() {
+  criteria <- list()
+  criteria[[1]] <- list("area.under.roc.curve", 0.99, 1)
+  criteria[[2]] <- list("predictive.accuracy", 0.98, 1)
+  criteria[[3]] <- list("precision", 0.95, 1)
+  criteria
+}
+
+# Create DataSet #3... (unique data sets among all algorithms, using description statistics metrics)
+GoSecondAttempt <- function() {
   dataSet <- data.frame()
   unique_idxs <- c()
+  runsCriteria <- CreateRunsCriteriaA()
   for (i in 1:length(algorithmsCriteria)) {
     algorithmName <- algorithmsCriteria[[i]][1]
     cat("---- ", algorithmName, " ----\n")
-    idxs <- GetResultsWithCriteria(globalResults, algorithmsCriteria[[i]][2])
+    idxs <- GetResultsWithCriteria(globalResults, algorithmsCriteria[[i]][2], runsCriteria)
     if (i == 1) {
       prepare_idxs <- idxs
     } else {
@@ -80,13 +96,18 @@ go <- function() {
   write.arff(dataSet, "DataSet2.arff")
 }
 
+# Create DataSet #1 & #2.
+GoFirstAttempt <- function() {
+  
+}
+
 # in:
 #     results - array of runs results
 #     name - name of algorithm (as regexp)
-GetResultsWithCriteria <- function(runs, name) {
+GetResultsWithCriteria <- function(runs, algorithmName, runsCriteria) {
   idxs <- list()
   for (i in 1:length(runs)) {
-    result <- FilterResult(runs[[i]], name)
+    result <- FilterResult(runs[[i]], algorithmName, runsCriteria)
     percent <- result[1]
     if (!is.nan(percent) && percent > 0.0) {
       cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", globalTasks[i, 1], percent, result[2], result[3], globalTasks[i, 5]))
@@ -106,16 +127,18 @@ PrepareDataSetChunk <- function(tasks, idxs, class) {
   data.frame(result, classes)
 }
 
-FilterResult <- function(result, name) {
+FilterResult <- function(result, algorithmName, runsCriteria) {
   percent <- NaN
   numAllRuns <- 0
   numGoodRuns <- 0
   if (nrow(result) != 0) {
-    filtered_runs <- FilterResultsByName(result, name)
+    filtered_runs <- FilterResultsByName(result, algorithmName)
     numAllRuns <- nrow(filtered_runs)
-    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.98, 1)
-    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.99, 1)
-    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "precision", 0.99, 1)
+    # Apply runs criteria
+    for (i in 1:length(runsCriteria)) {
+      criteria <- runsCriteria[[i]]
+      filtered_runs <- FilterResultsByEvaluation(filtered_runs, criteria[[1]], criteria[[2]], criteria[[3]])
+    }
     numGoodRuns <- nrow(filtered_runs)
     percent <- (numGoodRuns / numAllRuns) * 100
   } 
