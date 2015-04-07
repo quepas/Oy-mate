@@ -77,10 +77,14 @@ CreateRunsCriteriaB <- function() {
 }
 
 # Create DataSet #3... (unique data sets among all algorithms, using description statistics metrics)
-GoSecondAttempt <- function() {
+GoSecondExperiments <- function() {
+  SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
+  SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
+}
+
+SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
   dataSet <- data.frame()
   unique_idxs <- c()
-  runsCriteria <- CreateRunsCriteriaA()
   for (i in 1:length(algorithmsCriteria)) {
     algorithmName <- algorithmsCriteria[[i]][1]
     cat("---- ", algorithmName, " ----\n")
@@ -93,11 +97,11 @@ GoSecondAttempt <- function() {
     dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, prepare_idxs, algorithmName))
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
-  write.arff(dataSet, "DataSet2.arff")
+  write.arff(dataSet, paste(outputFile, ".arff"))
 }
 
 # Create DataSet #1 & #2.
-GoFirstAttempt <- function() {
+GoFirstExperiment <- function() {
   
 }
 
