@@ -52,30 +52,32 @@ LoadOMLTaskResults <- function(tasks, from, to) {
   results
 }
 
+# Setup algorithm criteria for experiment (algorithm set)
+SetupExperimentGlobalEnv <- function() {
+  algorithmsCriteria <<- list()
+  algorithmsCriteria[[1]] <<- c("weka.OneR", "^weka.OneR\\(.*\\)$")
+  algorithmsCriteria[[2]] <<- c("weka.ZeroR", "^weka.ZeroR\\(.*\\)$")
+  algorithmsCriteria[[3]] <<- c("weka.J48", "^weka.J48\\(.*\\)$")
+  algorithmsCriteria[[4]] <<- c("weka.NaiveBayes", "^weka.NaiveBayes\\(.*\\)$")
+  algorithmsCriteria[[5]] <<- c("weka.Logistic", "^weka.Logistic\\(.*\\)$")
+}
+
 go <- function() {
   dataSet <- data.frame()
   unique_idxs <- c()
-  print("---- weka.OneR ----")
-  idxs <- GetResultsWithCriteria(globalResults, "^weka.OneR\\(.*\\)$")
-  unique_idxs <- idxs
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, unique_idxs, "OneR"))
-  print("---- weka.ZeroR ----")
-  idxs <- GetResultsWithCriteria(globalResults, "^weka.ZeroR\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "ZeroR"))
-  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
-  print("---- weka.J48 ----")
-  idxs <- GetResultsWithCriteria(globalResults, "^weka.J48\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "J48"))
-  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
-  print("---- weka.NaiveBayes ----")
-  idxs <- GetResultsWithCriteria(globalResults, "^weka.NaiveBayes\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "NaiveBayes"))
-  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
-  print("---- weka.Logistic ----")
-  idxs <- GetResultsWithCriteria(globalResults, "^weka.Logistic\\(.*\\)$")
-  dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, setdiff(idxs, unique_idxs), "Logistic"))
-  unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs))
-  write.arff(dataSet, "DataSet.arff")
+  for (i in 1:length(algorithmsCriteria)) {
+    algorithmName <- algorithmsCriteria[[i]][1]
+    cat("---- ", algorithmName, " ----\n")
+    idxs <- GetResultsWithCriteria(globalResults, algorithmsCriteria[[i]][2])
+    if (i == 1) {
+      prepare_idxs <- idxs
+    } else {
+      prepare_idxs <- setdiff(idxs, unique_idxs)
+    }
+    dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, prepare_idxs, algorithmName))
+    unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
+  }
+  write.arff(dataSet, "DataSet2.arff")
 }
 
 # in:
@@ -111,7 +113,7 @@ FilterResult <- function(result, name) {
   if (nrow(result) != 0) {
     filtered_runs <- FilterResultsByName(result, name)
     numAllRuns <- nrow(filtered_runs)
-    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.99, 1)
+    filtered_runs <- FilterResultsByEvaluation(filtered_runs, "area.under.roc.curve", 0.98, 1)
     filtered_runs <- FilterResultsByEvaluation(filtered_runs, "predictive.accuracy", 0.99, 1)
     filtered_runs <- FilterResultsByEvaluation(filtered_runs, "precision", 0.99, 1)
     numGoodRuns <- nrow(filtered_runs)
