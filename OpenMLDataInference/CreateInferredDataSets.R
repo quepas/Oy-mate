@@ -1,6 +1,7 @@
 library(OpenML)
 library(foreign)
 library(plyr)
+library(tools)
 
 # Loading all needed OML data into global env.
 LoadOMLDataIntoGlobalEnv <- function() {
@@ -60,6 +61,9 @@ SetupExperimentGlobalEnv <- function() {
   algorithmsCriteria[[3]] <<- c("weka.J48", "^weka.J48\\(.*\\)$")
   algorithmsCriteria[[4]] <<- c("weka.NaiveBayes", "^weka.NaiveBayes\\(.*\\)$")
   algorithmsCriteria[[5]] <<- c("weka.Logistic", "^weka.Logistic\\(.*\\)$")
+
+  wekaJarPath <<- "D:/Programy2/Weka-3-6/weka.jar"
+  generatedModelDir <<- "./GeneratedModel/"
 }
 
 CreateRunsCriteriaA <- function() {
@@ -79,7 +83,9 @@ CreateRunsCriteriaB <- function() {
 # Create DataSet #3... (unique data sets among all algorithms, using description statistics metrics)
 GoSecondExperiments <- function() {
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
+  GenerateWEKAModel("DataSet3.arff")
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
+  GenerateWEKAModel("DataSet4.arff")
 }
 
 SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
@@ -119,6 +125,16 @@ GetResultsWithCriteria <- function(runs, algorithmName, runsCriteria) {
     }
   }
   idxs
+}
+
+# Generate java-based classificator model from given data set in *.arff file
+GenerateWEKAModel <- function(dataSetFile) {
+  wekaPathInQuotes <- paste("\"", wekaJarPath, "\"", sep="")
+  modelFile <- paste(generatedModelDir, file_path_sans_ext(dataSetFile), ".model", sep="")
+  runCommand <- paste("java", "-classpath", wekaPathInQuotes,
+                      "weka.classifiers.trees.J48", "-t", dataSetFile,
+                      "-d", modelFile)
+  system(runCommand)
 }
 
 PrepareDataSetChunk <- function(tasks, idxs, class) {
