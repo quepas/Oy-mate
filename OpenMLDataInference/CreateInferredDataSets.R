@@ -97,7 +97,7 @@ SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
     dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, prepare_idxs, algorithmName))
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
-  write.arff(dataSet, paste(outputFile, ".arff"))
+  write.arff(dataSet, paste(outputFile, ".arff", sep=""))
 }
 
 # Create DataSet #1 & #2.
