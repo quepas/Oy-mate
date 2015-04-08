@@ -88,14 +88,20 @@ CreateRunsCriteriaB <- function() {
 # Create DataSet #3... (unique data sets among all algorithms, using description statistics metrics)
 GoSecondExperiments <- function() {
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
-  GenerateWEKAModel("DataSet3.arff")
+  GenerateWEKAModel("DataSet3.arff");  
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
   GenerateWEKAModel("DataSet4.arff")
+}
+
+# List not used data set in meta-data set #3
+ListNotUsedDataSet <- function() {
+  usedDataSets <- SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
 }
 
 SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
   dataSet <- data.frame()
   unique_idxs <- c()
+  usedDataSetNames <<- c()
   for (i in 1:length(algorithmsCriteria)) {
     algorithmName <- algorithmsCriteria[[i]][1]
     cat("---- ", algorithmName, " ----\n")
@@ -109,6 +115,20 @@ SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
   write.arff(dataSet, paste(outputFile, ".arff", sep=""))
+  usedDataSetNames
+}
+
+FilterForNotUsedDataSets <- function(allDataSet) {
+  filteredDataSet <- data.frame()
+  usedDataSet <- unique(usedDataSetNames)
+  for (i in 1:nrow(allDataSet)) {
+    if (!(allDataSet[i, 3] %in% usedDataSet)) {
+      filteredDataSet <- rbind.fill(filteredDataSet, globalQualities[[allDataSet[i, 1]]])
+    }
+  }
+  notUsedDataSet <- unique(filteredDataSet)
+  write.arff(notUsedDataSet, "NotUsed.arff")
+  notUsedDataSet
 }
 
 # Create DataSet #1 & #2.
@@ -126,6 +146,7 @@ GetResultsWithCriteria <- function(runs, algorithmName, runsCriteria) {
     percent <- result[1]
     if (!is.nan(percent) && percent > 0.0) {
       cat(sprintf("Task_id: %d [%f%% (%d/%d)], data set: %s\n", globalTasks[i, 1], percent, result[2], result[3], globalTasks[i, 5]))
+      usedDataSetNames <<- c(usedDataSetNames, globalTasks[i, 5])
       idxs <- c(idxs, i)
     }
   }
