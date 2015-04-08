@@ -66,6 +66,11 @@ SetupExperimentGlobalEnv <- function() {
   generatedModelDir <<- "./GeneratedModel/"
 }
 
+# Create list of unique data set names
+CreateUniqueDataSetNames <- function() {
+  unique(globalDataSets[[3]])
+}
+
 CreateRunsCriteriaA <- function() {
   criteria <- list()
   criteria[[1]] <- list("area.under.roc.curve", 0.98, 1)
