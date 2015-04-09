@@ -63,7 +63,7 @@ SetupExperimentGlobalEnv <- function() {
   algorithmsCriteria[[5]] <<- c("weka.Logistic", "^weka.Logistic\\(.*\\)$")
 
   wekaJarPath <<- "D:/Programy2/Weka-3-6/weka.jar"
-  generatedModelDir <<- "./GeneratedModel/"
+  generatedModelDir <<- "./generated-model/"
 }
 
 # Create list of unique data set names
