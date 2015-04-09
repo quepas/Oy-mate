@@ -17,7 +17,7 @@ Directory: **autoweka-search-space-subset**
 
 ## Tools:
 
-  * Auto-WEKA (http://www.cs.ubc.ca/labs/beta/Projects/autoweka/)
-  * WEKA (http://www.cs.waikato.ac.nz/ml/weka/)
-  * OpenML (http://openml.org/)
-  * HeaRT (http://ai.ia.agh.edu.pl/wiki/hekate:heart)
+  * [Auto-WEKA](http://www.cs.ubc.ca/labs/beta/Projects/autoweka/)
+  * [WEKA](http://www.cs.waikato.ac.nz/ml/weka/)
+  * [OpenML](http://openml.org/)
+  * [HeaRT](http://ai.ia.agh.edu.pl/wiki/hekate:heart)
