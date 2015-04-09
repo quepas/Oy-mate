@@ -51,6 +51,12 @@ PrepareDataSetChunk <- function(tasks, idxs, class) {
   data.frame(result, classes)
 }
 
+PrepareTaskDataSetChunk <- function(tasks, idxs, class) {
+  dataSet <- tasks[unlist(idxs), 8:14]
+  classes <- data.frame(class=rep(class, nrow(dataSet)))
+  data.frame(dataSet, classes)
+}
+
 FilterResult <- function(result, algorithmName, runsCriteria) {
   percent <- NaN
   numAllRuns <- 0

@@ -13,7 +13,20 @@ SetupExperiments <- function() {
 
 # Prepare and run first experiment
 RunFirstExperiment <- function() {
-  
+  algorithmCriteria <- CreateAlgorithmsCriteria()
+  FirstExperiment(algorithmCriteria, CreateRunsCriteriaA(), "DataSet1")
+  FirstExperiment(algorithmCriteria, CreateRunsCriteriaB(), "DataSet2")
+}
+
+FirstExperiment <- function(algoCriteria, runsCriteria, outputFile) {
+  dataSet <- data.frame()
+  for (i in 1:length(algoCriteria)) {
+    algorithmName <- algoCriteria[[i]][1]
+    cat("---- ", algorithmName, " ----\n")
+    idxs <- GetResultsWithCriteria(globalResults, algoCriteria[[i]][2], runsCriteria)
+    dataSet <- rbind(dataSet, PrepareTaskDataSetChunk(globalTasks, idxs, algorithmName))
+  }
+  write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
 }
 
 # Prepare and run second 
