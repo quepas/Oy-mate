@@ -22,3 +22,7 @@ hs_err_pid*
 .Rhistory
 .Rproj.user
 *.RData
+
+# Oy-mate stuff
+*/generated-model/*.model
+*/generated-dataset/*.arff
