@@ -26,7 +26,7 @@ FirstExperiment <- function(algoCriteria, runsCriteria, outputFile) {
     idxs <- GetResultsWithCriteria(globalResults, algoCriteria[[i]][2], runsCriteria)
     dataSet <- rbind(dataSet, PrepareTaskDataSetChunk(globalTasks, idxs, algorithmName))
   }
-  write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
+  SaveARFF(dataSet, outputFile, generatedDatasetDir)
   dataSet
 }
 
@@ -57,6 +57,6 @@ SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
     dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, prepare_idxs, algorithmName))
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
-  write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
+  SaveARFF(dataSet, outputFile, generatedDatasetDir)
   dataSet
 }

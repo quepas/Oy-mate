@@ -1,4 +1,3 @@
-library(foreign)
 library(plyr)
 
 # Create list of unique data set names
@@ -89,8 +88,4 @@ PrepareDataSetQualities <- function(qvals) {
   colnames(data) <- qnames
   data[1, ] <- qvals[[2]]
   data
-}
-
-SaveARFF <- function(dataFrame, fileName, directory = "./") {
-  write.arff(dataFrame, paste(directory, fileName, ".arff", sep=""))
 }
