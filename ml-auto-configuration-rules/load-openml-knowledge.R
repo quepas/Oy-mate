@@ -64,6 +64,7 @@ SetupExperimentGlobalEnv <- function() {
 
   wekaJarPath <<- "D:/Programy2/Weka-3-6/weka.jar"
   generatedModelDir <<- "./generated-model/"
+  generatedDatasetDir <<- "./generated-dataset/"
 }
 
 # Create list of unique data set names
@@ -114,7 +115,7 @@ SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
     dataSet <- rbind.fill(dataSet, PrepareDataSetChunk(globalTasks, prepare_idxs, algorithmName))
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
-  write.arff(dataSet, paste(outputFile, ".arff", sep=""))
+  write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
   usedDataSetNames
 }
 
@@ -158,7 +159,7 @@ GenerateWEKAModel <- function(dataSetFile) {
   wekaPathInQuotes <- paste("\"", wekaJarPath, "\"", sep="")
   modelFile <- paste(generatedModelDir, file_path_sans_ext(dataSetFile), ".model", sep="")
   runCommand <- paste("java", "-classpath", wekaPathInQuotes,
-                      "weka.classifiers.trees.J48", "-t", dataSetFile,
+                      "weka.classifiers.trees.J48", "-t", paste(generatedDatasetDir, dataSetFile, sep=""),
                       "-d", modelFile)
   system(runCommand)
 }
