@@ -1,7 +1,4 @@
 library(OpenML)
-library(foreign)
-library(plyr)
-library(tools)
 
 # Loading all needed OML data into global env.
 LoadOMLDataIntoGlobalEnv <- function() {

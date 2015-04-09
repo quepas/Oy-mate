@@ -1,3 +1,5 @@
+library(tools)
+
 # Generate java-based classificator model from given data set in *.arff file
 GenerateWEKAModel <- function(dataSetFile) {
   wekaPathInQuotes <- paste("\"", wekaJarPath, "\"", sep="")
