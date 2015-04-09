@@ -90,3 +90,7 @@ PrepareDataSetQualities <- function(qvals) {
   data[1, ] <- qvals[[2]]
   data
 }
+
+SaveARFF <- function(dataFrame, fileName, directory = "./") {
+  write.arff(dataFrame, paste(directory, fileName, ".arff", sep=""))
+}

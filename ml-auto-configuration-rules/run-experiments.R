@@ -27,15 +27,18 @@ FirstExperiment <- function(algoCriteria, runsCriteria, outputFile) {
     dataSet <- rbind(dataSet, PrepareTaskDataSetChunk(globalTasks, idxs, algorithmName))
   }
   write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
+  dataSet
 }
 
 # Prepare and run second 
 RunSecondExperiment <- function() {
   algorithmsCriteria <- CreateAlgorithmsCriteria()
-  SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
-  GenerateWEKAModel("DataSet3.arff");  
-  SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
+  dataSet <- SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
+  GenerateWEKAModel("DataSet3.arff");
+  SaveARFF(unique(dataSet), "DataSet3Unique", generatedDatasetDir)
+  dataSet <- SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
   GenerateWEKAModel("DataSet4.arff")
+  SaveARFF(unique(dataSet), "DataSet4Unique", generatedDatasetDir)
 }
 
 SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
@@ -55,5 +58,5 @@ SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
     unique_idxs <- c(unique_idxs, setdiff(idxs, unique_idxs)) 
   }
   write.arff(dataSet, paste(generatedDatasetDir, outputFile, ".arff", sep=""))
-  usedDataSetNames
+  dataSet
 }
