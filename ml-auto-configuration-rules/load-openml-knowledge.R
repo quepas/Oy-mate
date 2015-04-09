@@ -49,3 +49,11 @@ LoadOMLTaskResults <- function(tasks, from, to) {
   }
   results
 }
+
+PrepareDataSetQualities <- function(qvals) {
+  qnames <- qvals[[1]]
+  data <- data.frame(matrix(dat=NA, ncol = length(qnames), nrow = 0))
+  colnames(data) <- qnames
+  data[1, ] <- qvals[[2]]
+  data
+}

@@ -81,11 +81,3 @@ FilterResultsByName <- function(results, name) {
 FilterResultsByEvaluation <- function(results, metrics, min, max) {
   subset(results, eval(parse(text=metrics)) >= min & eval(parse(text=metrics)) <= max)
 }
-
-PrepareDataSetQualities <- function(qvals) {
-  qnames <- qvals[[1]]
-  data <- data.frame(matrix(dat=NA, ncol = length(qnames), nrow = 0))
-  colnames(data) <- qnames
-  data[1, ] <- qvals[[2]]
-  data
-}
