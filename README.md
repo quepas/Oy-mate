@@ -1,4 +1,4 @@
 Oy-mate
 =======
 
-OpenML and AutoWeka are mates!
+WEKA, HeaRT, OpenML and AutoWeka are mates!
