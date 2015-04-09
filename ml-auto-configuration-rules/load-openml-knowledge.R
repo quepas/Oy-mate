@@ -55,12 +55,12 @@ LoadOMLTaskResults <- function(tasks, from, to) {
 
 # Setup algorithm criteria for experiment (algorithm set)
 SetupExperimentGlobalEnv <- function() {
-  algorithmsCriteria <<- list()
-  algorithmsCriteria[[1]] <<- c("weka.OneR", "^weka.OneR\\(.*\\)$")
-  algorithmsCriteria[[2]] <<- c("weka.ZeroR", "^weka.ZeroR\\(.*\\)$")
-  algorithmsCriteria[[3]] <<- c("weka.J48", "^weka.J48\\(.*\\)$")
-  algorithmsCriteria[[4]] <<- c("weka.NaiveBayes", "^weka.NaiveBayes\\(.*\\)$")
-  algorithmsCriteria[[5]] <<- c("weka.Logistic", "^weka.Logistic\\(.*\\)$")
+  algorithmsCriteria <<- list(
+    c("weka.OneR", "^weka.OneR\\(.*\\)$"),
+    c("weka.ZeroR", "^weka.ZeroR\\(.*\\)$"),
+    c("weka.J48", "^weka.J48\\(.*\\)$"),
+    c("weka.NaiveBayes", "^weka.NaiveBayes\\(.*\\)$"),
+    c("weka.Logistic", "^weka.Logistic\\(.*\\)$"))
 
   wekaJarPath <<- "D:/Programy2/Weka-3-6/weka.jar"
   generatedModelDir <<- "./generated-model/"
@@ -72,16 +72,16 @@ CreateUniqueDataSetNames <- function() {
 }
 
 CreateRunsCriteriaA <- function() {
-  criteria <- list()
-  criteria[[1]] <- list("area.under.roc.curve", 0.98, 1)
+  criteria <- list(
+    list("area.under.roc.curve", 0.98, 1))
   criteria
 }
 
 CreateRunsCriteriaB <- function() {
-  criteria <- list()
-  criteria[[1]] <- list("area.under.roc.curve", 0.99, 1)
-  criteria[[2]] <- list("predictive.accuracy", 0.98, 1)
-  criteria[[3]] <- list("precision", 0.95, 1)
+  criteria <- list(
+    list("area.under.roc.curve", 0.99, 1),
+    list("predictive.accuracy", 0.98, 1),
+    list("precision", 0.95, 1))
   criteria
 }
 
