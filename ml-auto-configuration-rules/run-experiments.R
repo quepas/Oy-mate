@@ -18,20 +18,21 @@ RunFirstExperiment <- function() {
 
 # Prepare and run second 
 RunSecondExperiment <- function() {
+  algorithmsCriteria <- CreateAlgorithmsCriteria()
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaA(), "DataSet3")
   GenerateWEKAModel("DataSet3.arff");  
   SecondExperiment(algorithmsCriteria, CreateRunsCriteriaB(), "DataSet4")
   GenerateWEKAModel("DataSet4.arff")
 }
 
-SecondExperiment <- function(algorithmCriteria, runsCriteria, outputFile) {
+SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
   dataSet <- data.frame()
   unique_idxs <- c()
   usedDataSetNames <<- c()
-  for (i in 1:length(algorithmsCriteria)) {
-    algorithmName <- algorithmsCriteria[[i]][1]
+  for (i in 1:length(algoCriteria)) {
+    algorithmName <- algoCriteria[[i]][1]
     cat("---- ", algorithmName, " ----\n")
-    idxs <- GetResultsWithCriteria(globalResults, algorithmsCriteria[[i]][2], runsCriteria)
+    idxs <- GetResultsWithCriteria(globalResults, algoCriteria[[i]][2], runsCriteria)
     if (i == 1) {
       prepare_idxs <- idxs
     } else {
