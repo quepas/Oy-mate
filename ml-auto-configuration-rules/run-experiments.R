@@ -3,7 +3,7 @@ source("setup-environment.R")
 source("setup-experiments.R")
 source("load-openml-knowledge.R")
 source("generate-dataset.R")
-source("generate-model.R")
+source("weka-utils.R")
 
 SetupExperiments <- function() {
   SetupGlobalEnv()
