@@ -32,7 +32,8 @@ TestInstances <- function(classifier, instances) {
  predict(classifier, instances)
 }
 
-RankInstances <- function(classifier, instances) {
-  predict(classifier, instances, type = c("probability"))
-  # TODO: return ranking factors
+RankInstance <- function(classifier, instance) {
+  rank <- predict(classifier, instance, type = c("probability"))
+  rank <- rank[, order(rank, decreasing = TRUE)]
+  data.frame(row.names = 1:length(rank), name=names(rank), value=rank)
 }
