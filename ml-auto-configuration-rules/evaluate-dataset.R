@@ -1,3 +1,5 @@
+source('weka-utils.R')
+
 EvaluateConfDataSet <- function(dataSetQualities, confDataSetName) {
   confDataSet <- LoadARFF(confDataSetName, directory = generatedDatasetDir)
   # Extract header, leave class column
@@ -27,10 +29,8 @@ ListBestAlgorithms <- function(datasetID, tasks = globalTasks,
       datasetRuns <- rbind(datasetRuns, run)
     }
   }
-  print(dim(datasetRuns))
   # filter by result criteria
   datasetRuns <- datasetRuns[datasetRuns[criteria] >= thresholds, ]
-  print(dim(datasetRuns))
   # filter by algorithms
   result <- data.frame()
   if (length(algorithms) == 0) {
@@ -42,3 +42,23 @@ ListBestAlgorithms <- function(datasetID, tasks = globalTasks,
   }
   result
 }
+
+EvaluateAlgorithm <- function(datasetID) {
+  
+}
+
+EvaluateConfDataset <- function(filename = "DataSet3", directory = generatedDatasetDir, testDatasetID = 1,
+                                qualities = globalQualities) {
+  confDataset <- LoadARFF(filename, directory)
+  # Extract conf-dataset header, ditch class attribute
+  confDatasetHeader <- confDataset[0, -ncol(confDataset)]
+  # Create test instance from testDatasetID
+  testDataset <- rbind.left(confDatasetHeader, qualities[[testDatasetID]])
+  # Build conf-dataset classifier
+  classifier <- BuildConfClassifier(confDataset)
+  # Test classifier against test instance
+  #result <- TestInstances(classifier, testDataset)
+  result <- RankInstance(classifier, testDataset)
+  result
+}
+
