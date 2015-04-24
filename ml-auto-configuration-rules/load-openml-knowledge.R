@@ -6,8 +6,8 @@ LoadOMLDataIntoGlobalEnv <- function() {
   session.hash <<- authenticateUser(username = "openml.rteam@gmail.com", password = "testpassword")
 
   globalTasks <<- LoadOMLTasks("Supervised Classification")
-  globalDataSets <<- listOMLDataSets(status = c("active", "in_preparation"))
-  globalQualities <<- LoadOMLDataSetsQualities(globalDataSets[, 1])
+  globalDataSets <<- listOMLDataSets(status = c("active"))
+  globalQualities <<- LoadOMLDataSetsQualities(globalDataSets[globalDataSets$did != 1415, 1])
   globalResults <<- LoadOMLTaskResults(globalTasks)
 }
 
