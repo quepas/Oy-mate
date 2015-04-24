@@ -8,7 +8,7 @@ LoadOMLDataIntoGlobalEnv <- function() {
   globalTasks <<- LoadOMLTasks("Supervised Classification")
   globalDataSets <<- listOMLDataSets(status = c("active"))
   globalQualities <<- LoadOMLDataSetsQualities(globalDataSets[globalDataSets$did != 1415, 1])
-  globalResults <<- LoadOMLTaskResults(globalTasks)
+  globalResults <<- LoadOMLTaskResults(globalTasks[, 1])
 }
 
 # Loading all tasks with given type (ex. "Supervised Classification")
@@ -30,18 +30,16 @@ LoadOMLDataSetsQualities <- function(dataSetID) {
 }
 
 # Loading all run results for given tasks
-LoadOMLTaskResults <- function(tasks) {
-  results <- list()
-  index <- 1
-  for (taskID in tasks[, 1]) {
-    results[[index]] <- listOMLRunResults(taskID)
-    index <- index + 1
+LoadOMLTaskResults <- function(taskIDs) {
+  runs <- data.frame()
+  for (id in taskIDs) {
+    runs <- rbind.fill(runs, listOMLRunResults(id))
   }
-  results
+  runs
 }
 
 # Loading run results for given tasks range
-LoadOMLTaskResults <- function(tasks, from, to) {
+LoadOMLTaskResultsFromTo <- function(tasks, from, to) {
   results <- list()
   index <- 1
   for (i in from:to) {
