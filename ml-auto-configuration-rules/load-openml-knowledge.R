@@ -1,4 +1,5 @@
 library(OpenML)
+library(plyr)
 
 # Loading all needed OML data into global env.
 LoadOMLDataIntoGlobalEnv <- function() {
@@ -6,7 +7,7 @@ LoadOMLDataIntoGlobalEnv <- function() {
 
   globalTasks <<- LoadOMLTasks("Supervised Classification")
   globalDataSets <<- listOMLDataSets()
-  globalQualities <<- LoadOMLDataSetsQualities(globalDataSets)
+  globalQualities <<- LoadOMLDataSetsQualities(globalDataSets[, 1])
   globalResults <<- LoadOMLTaskResults(globalTasks)
 }
 
@@ -18,11 +19,12 @@ LoadOMLTasks <- function(taskTypeName) {
   tasks
 }
 
-# Loading qualities for given data sets
-LoadOMLDataSetsQualities <- function(dataSets) {
-  qualities <- list()
-  for (dataSetID in dataSets[, 1]) {
-    qualities[[dataSetID]] <- PrepareDataSetQualities(listOMLDataSetQualities(dataSetID))
+# Loading qualities for given data sets ids
+LoadOMLDataSetsQualities <- function(dataSetID) {
+  qualities <- data.frame()
+  for (dataSetID in dataSetID) {
+    row <- PrepareDataSetQualities(dataSetID, listOMLDataSetQualities(dataSetID))
+    qualities <- rbind.fill(qualities, row)
   }
   qualities
 }
@@ -50,10 +52,18 @@ LoadOMLTaskResults <- function(tasks, from, to) {
   results
 }
 
-PrepareDataSetQualities <- function(qvals) {
-  qnames <- qvals[[1]]
-  data <- data.frame(matrix(dat=NA, ncol = length(qnames), nrow = 0))
-  colnames(data) <- qnames
-  data[1, ] <- qvals[[2]]
+PrepareDataSetQualities <- function(did, quality) {
+  names <- quality[[1]]
+  data <- data.frame(matrix(dat = NA, ncol = length(names)+ 1, nrow = 0))
+  colnames(data) <- c("did", names)
+  data[1, ] <- c(did, quality[[2]])
   data
+}
+
+QualitiesListToDataFrame <- function(qualities) {
+  result <- data.frame()
+  for (i in 1:length(qualities)) {
+    result <- rbind.fill(result, qualities[[i]])
+  }
+  result
 }
