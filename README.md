@@ -25,6 +25,12 @@ Scripts for generating random datasets for WEKA. Using external tools:
 
 Directory: **dataset-generation**
 
+### WEKA rule extraction
+
+Application for extracting rules from rule/decision tree classifiers (JRip, J48 etc.).
+
+Directory: **weka-rule-extraction**
+
 ## Tools:
 
   * [Auto-WEKA](http://www.cs.ubc.ca/labs/beta/Projects/autoweka/)
