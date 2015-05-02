@@ -4,11 +4,10 @@ source("setup-experiments.R")
 source("load-openml-knowledge.R")
 source("generate-dataset.R")
 source("weka-utils.R")
+source("file-utils.R")
 
 SetupExperiments <- function() {
   SetupGlobalEnv()
-  SetupExperimentGlobalEnv()
-  
 }
 
 # Prepare and run first experiment
@@ -59,4 +58,21 @@ SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
   }
   SaveARFF(dataSet, outputFile, generatedDatasetDir)
   dataSet
+}
+
+RunExperiment <- function() {
+  dataSet <- data.frame()
+  criteria <- CreateAlgorithmsCriteria()
+  goodRuns <- globalResults[globalResults$area.under.roc.curve >= 0.98, ]
+
+  for (i in 1:length(criteria)) {
+    algo <- criteria[[i]]
+    algoRuns <- subset(goodRuns, grepl(algo[2], implementation))
+    tasks <- unique(algoRuns$task.id)
+    did <- globalTasks[globalTasks$task_id %in% tasks, "did"]
+    data <- globalQualities[globalQualities$did %in% did, -1]
+    classes <- data.frame(class=rep(algo[1], nrow(data)))
+    dataSet <- rbind(dataSet, data.frame(data, classes))
+  }
+  SaveARFF(dataSet, "DataSetNewTest98", generatedDatasetDir)
 }
