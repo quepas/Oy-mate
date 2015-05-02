@@ -1,3 +1,18 @@
+CreateAlgorithmsFrame <- function() {
+  name <- c("weka.OneR",
+            "weka.ZeroR",
+            "weka.J48",
+            "weka.NaiveBayes",
+            "weka.Logistic")
+  openmlName <- c("^weka.OneR\\(.*\\)$",
+                  "^weka.ZeroR\\(.*\\)$",
+                  "^weka.J48\\(.*\\)$",
+                  "^weka.NaiveBayes\\(.*\\)$",
+                  "^weka.Logistic\\(.*\\)$")
+  data.frame(name, openmlName)
+}
+
+
 CreateAlgorithmsCriteria <- function() {
   criteria <- list(
     c("weka.OneR", "^weka.OneR\\(.*\\)$"),
