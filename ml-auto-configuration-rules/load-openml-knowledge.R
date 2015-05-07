@@ -65,3 +65,8 @@ QualitiesListToDataFrame <- function(qualities) {
   }
   result
 }
+
+FilterWEKAFlowsName <- function(flows) {
+  flows[grep("weka.*", flows$name), ]
+  unique(flows$name)
+}

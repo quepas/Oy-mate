@@ -62,16 +62,25 @@ SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
 
 RunExperiment <- function() {
   dataSet <- data.frame()
-  algorithms <- CreateAlgorithmsFrame()
+  algorithms <- CreateAlgorithmsFrame() #CreateAlgorithmsFrameAll()
   goodRuns <- globalResults[globalResults$area.under.roc.curve >= 0.98, ]
+ # goodRuns <- globalResults[globalResults$predictive.accuracy >= 0.8, ]
 
   for (i in 1:nrow(algorithms)) {
     algoRuns <- subset(goodRuns, grepl(algorithms$openmlName[i], implementation))
-    tasks <- unique(algoRuns$task.id)
+    tasks <- algoRuns$task.id
+    #tasks <- unique(algoRuns$task.id)
     did <- globalTasks[globalTasks$task_id %in% tasks, "did"]
-    data <- globalQualities[globalQualities$did %in% did, -1]
+    #print(did)
+    #data <- globalQualities[globalQualities$did %in% did, -1]
+    data <- globalQualities[globalQualities$did %in% did, ]
     classes <- data.frame(class=rep(algorithms$name[i], nrow(data)))
     dataSet <- rbind(dataSet, data.frame(data, classes))
   }
-  SaveARFF(dataSet, "DataSetNewTest98", generatedDatasetDir)
+  #dataSet <- RemoveMissingColumns(dataSet, 0.6)
+  #dataSet <- RemoveMissingRows(dataSet, 0.5)
+  dataSet <- UniqueDataSetSampling(dataSet)
+  dataSet <- dataSet[, -1]
+  SaveARFF(dataSet, "DataSetNewTestAll", generatedDatasetDir)
+  dataSet
 }

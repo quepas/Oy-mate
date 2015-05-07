@@ -1,17 +1,31 @@
 CreateAlgorithmsFrame <- function() {
-  name <- c("weka.OneR",
-            "weka.ZeroR",
+  name <- c(#"weka.OneR",
+            #"weka.ZeroR",
             "weka.J48",
             "weka.NaiveBayes",
-            "weka.Logistic")
-  openmlName <- c("^weka.OneR\\(.*\\)$",
-                  "^weka.ZeroR\\(.*\\)$",
+            "weka.Logistic",
+            "weka.RandomTree",
+            "weka.JRip",
+            "weka.A1DE",
+            "weka.Bagging_REPTree")
+  openmlName <- c(#"^weka.OneR\\(.*\\)$",
+                  #"^weka.ZeroR\\(.*\\)$",
                   "^weka.J48\\(.*\\)$",
                   "^weka.NaiveBayes\\(.*\\)$",
-                  "^weka.Logistic\\(.*\\)$")
+                  "^weka.Logistic\\(.*\\)$",
+                  "^weka.RandomTree\\(.*\\)$",
+                  "^weka.JRip\\(.*\\)$",
+                  "^weka.A1DE\\(.*\\)$",
+                  "^weka.Bagging_REPTree\\(.*\\)")
   data.frame(name, openmlName)
 }
 
+CreateAlgorithmsFrameAll <- function() {
+  flows <- FilterWEKAFlowsName(globalFlows)
+  name <- flows
+  openmlName <- paste("^", flows, "\\(.*\\)$", sep="")
+  data.frame(name, openmlName)
+}
 
 CreateAlgorithmsCriteria <- function() {
   criteria <- list(

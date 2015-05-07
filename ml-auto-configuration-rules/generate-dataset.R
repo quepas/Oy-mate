@@ -81,3 +81,32 @@ FilterResultsByName <- function(results, name) {
 FilterResultsByEvaluation <- function(results, metrics, min, max) {
   subset(results, eval(parse(text=metrics)) >= min & eval(parse(text=metrics)) <= max)
 }
+
+RemoveMissingColumns <- function(dataSet, missingPercent) {
+  missing <- c()
+  for (i in 1:ncol(dataSet)) {
+    if (sum(is.na(dataSet[, i]))/length(dataSet[, i]) >= missingPercent) {
+      missing <- c(missing, i)
+    }
+  }
+  dataSet[, -missing]
+}
+
+RemoveMissingRows <- function(dataSet, missingPercent) {
+  missing <- c()
+  for (i in 1:nrow(dataSet)) {
+    if (sum(is.na(dataSet[i, ]))/ncol(dataSet) >= missingPercent) {
+      missing <- c(missing, i)
+    }
+  }
+  dataSet[-missing, ]
+}
+
+UniqueDataSetSampling <- function(dataSet) {
+  result <- data.frame()
+  for (i in unique(dataSet$did)) {
+    subset <- dataSet[dataSet$did == i, ]
+    result <- rbind(result, subset[sample(nrow(subset), 1), ])
+  }
+  result
+}
