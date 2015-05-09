@@ -1,3 +1,6 @@
+# libraries
+library(dplyr)
+
 # Loading external scripts
 source("setup-environment.R")
 source("setup-experiments.R")
@@ -82,5 +85,35 @@ RunExperiment <- function() {
   dataSet <- UniqueDataSetSampling(dataSet)
   dataSet <- dataSet[, -1]
   SaveARFF(dataSet, "DataSetNewTestAll", generatedDatasetDir)
+  dataSet
+}
+
+RunRankingExperiment <- function() {
+  dataSet <- data.frame()
+  algorithms <- CreateAlgorithmsFrame()
+  goodRuns <- globalResults[globalResults$area.under.roc.curve >= 0.98, ]
+
+  # append 'did' column
+  goodRuns <- mutate(goodRuns, did = globalTasks[task.id, "did"])
+
+  sapply(globalDataSets$did, function(id) {
+    dsRuns <- filter(goodRuns, did == id)
+    dsRuns <- arrange(dsRuns, desc(area.under.roc.curve))
+    implementations <- unique(dsRuns$implementation)
+    if (length(implementations) != 0) {
+      onlyNames <- sapply(implementations, USE.NAMES = FALSE, function(name) {
+         strsplit(name, "(", fixed = TRUE)[[1]][1]
+      })
+      onlyNames <- unique(onlyNames[onlyNames %in% algorithms$name])
+      if (length(onlyNames) > 1) {
+        dataSetQualities <- filter(globalQualities, did == id)
+        dataSet <<- rbind(dataSet, data.frame(dataSetQualities, ranks=PrepareRanks(onlyNames)))
+        print(dataSet)
+      }
+    }
+  })
+  # drop 'did' column
+  dataSet <- dataSet[, -1]
+  SaveXARFF(dataSet, "DataSetRanking", generatedDatasetDir, ranks = as.character(algorithms$name))
   dataSet
 }
