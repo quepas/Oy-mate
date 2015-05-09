@@ -110,3 +110,7 @@ UniqueDataSetSampling <- function(dataSet) {
   }
   result
 }
+
+PrepareRanks <- function(algorithmNames) {
+  paste(algorithmNames, collapse = ">")
+}
