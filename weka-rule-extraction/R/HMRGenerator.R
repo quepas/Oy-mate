@@ -6,8 +6,8 @@ WEKA2HMR <- function() {
   
 }
 
-"xattr [name: class,
-       abbrev: class,
+"xattr [name: class_attr,
+       abbrev: class_attr,
        class: simple,
        type: class_type,
        comm: in,
@@ -58,7 +58,7 @@ GenerateHMRRule <- function(rule, id) {
       class <<- subrule
     }
   })
-  paste(text, paste(all, collapse=",\n\t\t "), "]\n\t==>\n\t\t[class set '", class, "'].", sep="")
+  paste(text, paste(all, collapse=",\n\t\t "), "]\n\t==>\n\t\t[class_attr set '", class, "'].", sep="")
 }
 
 GenerateHMRAttr <- function(attribute) {
@@ -81,7 +81,7 @@ GenerateHMRClassType <- function(classes) {
 }
 
 GenerateHMRSchm <- function(attributes) {
-  paste("xschm meta: [", paste("'", attributes, "'", sep = "", collapse = ", "), "] ==> [class].", sep = "")
+  paste("xschm meta: [", paste("'", attributes, "'", sep = "", collapse = ", "), "] ==> [class_attr].", sep = "")
 }
 
 ConvertOperator <- function(operator) {
