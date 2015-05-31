@@ -7,6 +7,7 @@ ParseWEKATree <- function(treeText) {
   rules <- list()
   subrules <- c()
   level <- 0
+  rule_counter <- 1
 
   for (line in strsplit(treeText, "\n", fixed = TRUE)[[1]]) {
     tokens <- strsplit(line, "[ :]", fixed = FALSE)[[1]]
@@ -16,7 +17,7 @@ ParseWEKATree <- function(treeText) {
     if (level == 0) {
       subrules <- c()
     } else {
-      subrules <- subrules[1:level*3]
+      subrules <- subrules[1:(level*3)]
     }
     # remove level indicators
     tokens <- tokens[tokens != "|"]
@@ -25,7 +26,8 @@ ParseWEKATree <- function(treeText) {
       subrules <- c(subrules, tokens)
     } else if (ntokens == 5) {
       level <- level - 1
-      rules <- list(rules, c(subrules, tokens[1:4]))
+      rules[[rule_counter]] <- c(subrules, tokens[1:4])
+      rule_counter <- rule_counter + 1
     } else {
       warning("Bad sub/end rule!")
     }
