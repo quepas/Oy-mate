@@ -34,3 +34,7 @@ ParseWEKATree <- function(treeText) {
 	}
   rules
 }
+
+ExtractSubrules <- function(rule) {
+  split(rule, as.integer((seq_along(rule) - 1) / 3))
+}
