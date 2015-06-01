@@ -84,6 +84,7 @@ RunExperiment <- function() {
   #dataSet <- RemoveMissingRows(dataSet, 0.5)
   dataSet <- UniqueDataSetSampling(dataSet)
   dataSet <- dataSet[, -1]
+  dataSet <- FillNA(dataSet)
   SaveARFF(dataSet, "DataSetNewTestAll", generatedDatasetDir)
   dataSet
 }
@@ -116,4 +117,12 @@ RunRankingExperiment <- function() {
   dataSet <- dataSet[, -1]
   SaveXARFF(dataSet, "DataSetRanking", generatedDatasetDir, ranks = as.character(algorithms$name))
   dataSet
+}
+
+GenerateMLAutoconfRules <- function() {
+  dataset <- RunExperiment();
+  classifier <- J48(class ~ ., data = dataset)
+  rules <- ParseRWekaTree(classifier)
+  hmr <- GenerateHMR(rules, dataset)
+  write(hmr, file = "rule.hmr")
 }

@@ -114,3 +114,15 @@ UniqueDataSetSampling <- function(dataSet) {
 PrepareRanks <- function(algorithmNames) {
   paste(algorithmNames, collapse = ">")
 }
+
+FillNA <- function(dataset) {
+  for (col in names(dataset)) {
+    column <- dataset[, col]
+    if (anyNA(column)) {
+      meanColumn <- mean(column, na.rm = TRUE)
+      column[is.na(column)] <- meanColumn
+      dataset[, col] <- column
+    }
+  }
+  dataset
+}
