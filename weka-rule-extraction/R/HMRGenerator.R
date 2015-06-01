@@ -27,7 +27,6 @@ GenerateHMR <- function(rules, dataset) {
   # generate class xattr
   hmr <- paste(hmr, class_xattr, sep = "\n")
   # generate meta xattr
-  dataset <- read.arff(dataset)
   attributes <- names(dataset)
   attributes <- attributes[-length(attributes)]
   for (attr in attributes) {
@@ -42,7 +41,7 @@ GenerateHMR <- function(rules, dataset) {
     hmr <- paste(hmr, GenerateHMRRule(rule, rule_counter), sep = "\n");
     rule_counter <- rule_counter + 1
   }
-  write(hmr, file = "rule.hmr")
+  hmr
 }
 
 GenerateHMRRule <- function(rule, id) {
@@ -72,7 +71,7 @@ GenerateHMRAttr <- function(attribute) {
 }
 
 GenerateHMRClassType <- function(classes) {
-  str_classes <- paste("'", unique(dataset$class), "'", sep = "", collapse = ",")
+  str_classes <- paste("'", unique(classes), "'", sep = "", collapse = ",")
   paste("xtype [name: class_type,",
         "\n\t\t\t base: symbolic,",
         "\n\t\t\t domain: [",

@@ -1,3 +1,4 @@
+library(rJava)
 # 1. Tokenize
 # 2. Find rule level
 # 3. Extract rule elements
@@ -33,6 +34,14 @@ ParseWEKATree <- function(treeText) {
     }
 	}
   rules
+}
+
+ParseRWekaTree <- function(tree) {
+  weka_tree <- as.matrix(scan(text = .jcall(tree$classifier, "S", "toString"), sep = "\n", what = ""))
+  tree_line <- length(weka_tree)
+  weka_tree <- weka_tree[-c(1, 2, tree_line, tree_line-1)]
+  weka_tree <- paste(weka_tree, collapse = "\n")
+  ParseWEKATree(weka_tree)
 }
 
 ExtractSubrules <- function(rule) {
