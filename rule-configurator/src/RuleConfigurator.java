@@ -2,17 +2,23 @@ import heart.Configuration;
 import heart.HeaRT;
 import heart.State;
 import heart.StateElement;
-import heart.alsvfd.Any;
 import heart.alsvfd.Formulae;
 import heart.alsvfd.Null;
 import heart.alsvfd.SimpleNumeric;
-import heart.alsvfd.expressions.ExpressionInterface;
 import heart.exceptions.*;
 import heart.parser.hmr.HMRParser;
 import heart.parser.hmr.runtime.SourceFile;
 import heart.xtt.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  * Created by Quepas on 2015-05-31.
@@ -21,8 +27,33 @@ public class RuleConfigurator {
 
     public static void main(String[] args) {
         System.out.println("-------------------- RuleConfigurator --------------------");
-        SourceFile hmrFile = new SourceFile("D:/Programowanie/Projekty/Oy-mate/weka-rule-extraction/R/rule.hmr");
+        System.out.print("Choose DataSet ID: ");
+        Scanner scanner = new Scanner(System.in);
+        int dataSetId = scanner.nextInt();
+        File csvData = new File("D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/qualities.csv");
+        ArrayList<String> csvAttributes = new ArrayList<String>();
+        ArrayList<Double> csvValues = new ArrayList<Double>();
+        CSVParser csvParser = null;
+        try {
+            csvParser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.RFC4180);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (CSVRecord csvRecord : csvParser ) {
+            // check for header
+            if (csvRecord.getRecordNumber() == 1) {
+                for (int i = 1; i < csvRecord.size(); ++i) {
+                    csvAttributes.add(csvRecord.get(i));
+                }
+            } else if(Integer.valueOf(csvRecord.get(0)) == dataSetId) {
+                for (int i = 1; i < csvRecord.size(); ++i) {
+                    csvValues.add(Double.valueOf(csvRecord.get(i)));
+                }
+            }
+        }
+        SourceFile hmrFile = new SourceFile("D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/rule.hmr");
         HMRParser parser = new HMRParser();
+        State XTTState = new State();
         try {
             parser.parse(hmrFile);
             XTTModel model = parser.getModel();
@@ -51,20 +82,19 @@ public class RuleConfigurator {
                         System.out.println("\t" + decision.getAttribute().getName() + " set " + decision.getDecision());
                     }
                 }
+                for (int i = 0; i < csvAttributes.size(); ++i) {
+                    String attr = csvAttributes.get(i);
+                    Double value = csvValues.get(i);
+                    StateElement stateElement = new StateElement();
+                    stateElement.setAttributeName(attr);
+                    stateElement.setValue(new SimpleNumeric(value));
+                    XTTState.addStateElement(stateElement);
+                }
+
                 System.out.println("----------------------------------------------------------");
                 System.out.println("HeaRT inference process");
                 System.out.println("----------------------------------------------------------");
             }
-
-            StateElement num = new StateElement();
-            num.setAttributeName("MinorityClassSize");
-            num.setValue(new SimpleNumeric(11111.0));
-            StateElement num2 = new StateElement();
-            num2.setAttributeName("MajorityClassSize");
-            num2.setValue(new SimpleNumeric(12.0));
-            State XTTState = new State();
-            XTTState.addStateElement(num);
-            XTTState.addStateElement(num2);
 
             try{
                 HeaRT.fixedOrderInference(model,
