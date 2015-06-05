@@ -2,7 +2,7 @@ library(foreign)
 
 # Saving data frame as ARFF file, fileName without extension
 SaveARFF <- function(dataFrame, fileName, directory = "", extension = "arff") {
-  write.arff(dataFrame, paste(directory, fileName, ".", extension, sep=""))
+  write.arff(dataFrame, paste(directory, fileName, ".", extension, sep=""), relation = fileName)
 }
 
 # Loading ARFF file as data frame, fileName without extension
