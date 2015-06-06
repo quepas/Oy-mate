@@ -1,7 +1,7 @@
 library(dplyr)
 
-PlotAllDatasetBestMetrics <- function(metrics) {
-  did <- globalDataSets$did
+PlotAllDatasetBestMetrics <- function(metrics, datasets = globalDataSets) {
+  did <- datasets$did
   all_best <- c()
   for (id in did) {
     all_best <- c(all_best, DatasetBestMetrics(id, metrics))
@@ -20,11 +20,11 @@ DatasetBestMetrics <- function(did, metrics) {
   }
 }
 
-TaskIdForDataset <- function(datasetId) {
-  filter(globalTasks, did == datasetId)$task_id
+TaskIdForDataset <- function(datasetId, tasks = globalTasks) {
+  filter(tasks, did == datasetId)$task_id
 }
 
-ResultForDataset <- function(datasetId) {
+ResultForDataset <- function(datasetId, runs = globalResults) {
   tasks <- TaskIdForDataset(datasetId)
-  filter(globalResults, task.id %in% tasks)
+  filter(runs, task.id %in% tasks)
 }
