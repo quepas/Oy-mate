@@ -9,6 +9,10 @@ PlotAllDatasetBestMetrics <- function(metrics, datasets = globalDataSets) {
   all_best
 }
 
+MetaAttributesMissingValuesCoverage <- function(meta_attributes = globalQualities) {
+  sapply(meta_attributes, function(col) sum(is.na(col)))/nrow(meta_attributes)
+}
+
 # ------------------------- helper functions -------------------------
 DatasetBestMetrics <- function(did, metrics) {
   results <- ResultForDataset(did)
