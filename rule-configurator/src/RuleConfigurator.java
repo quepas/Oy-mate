@@ -1,24 +1,11 @@
-import heart.Configuration;
-import heart.HeaRT;
-import heart.State;
-import heart.StateElement;
-import heart.alsvfd.Formulae;
-import heart.alsvfd.Null;
-import heart.alsvfd.SimpleNumeric;
-import heart.exceptions.*;
-import heart.parser.hmr.HMRParser;
-import heart.parser.hmr.runtime.SourceFile;
-import heart.xtt.*;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.List;
 
 /**
  * Created by Quepas on 2015-05-31.
@@ -27,31 +14,30 @@ public class RuleConfigurator {
 
     public static void main(String[] args) {
         System.out.println("-------------------- RuleConfigurator --------------------");
-        System.out.print("Choose DataSet ID: ");
-        Scanner scanner = new Scanner(System.in);
-        int dataSetId = scanner.nextInt();
-        File csvData = new File("D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/qualities.csv");
-        ArrayList<String> csvAttributes = new ArrayList<String>();
-        ArrayList<Double> csvValues = new ArrayList<Double>();
-        CSVParser csvParser = null;
+        MetaAttrMatcher metaAttrMatcher = null;
         try {
-            csvParser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.RFC4180);
+            metaAttrMatcher = new MetaAttrMatcher(
+                    "D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/rule.hmr",
+                    "D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/qualities.csv");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (CSVRecord csvRecord : csvParser ) {
-            // check for header
-            if (csvRecord.getRecordNumber() == 1) {
-                for (int i = 1; i < csvRecord.size(); ++i) {
-                    csvAttributes.add(csvRecord.get(i));
-                }
-            } else if(Integer.valueOf(csvRecord.get(0)) == dataSetId) {
-                for (int i = 1; i < csvRecord.size(); ++i) {
-                    csvValues.add(Double.valueOf(csvRecord.get(i)));
-                }
+        List<String> conclusions = metaAttrMatcher.inferenceAll();
+        List<CSVRecord> csvRecords = new ArrayList<CSVRecord>();
+        try {
+            FileWriter fileWriter = new FileWriter("predictions.csv");
+            fileWriter.write("did;algorithm\n");
+            for (String entry : conclusions) {
+                fileWriter.write(entry + "\n");
+                System.out.println(entry);
             }
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        SourceFile hmrFile = new SourceFile("D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/rule.hmr");
+
+
+        /*SourceFile hmrFile = new SourceFile("D:/Programowanie/Projekty/Oy-mate/ml-auto-configuration-rules/rule.hmr");
         HMRParser parser = new HMRParser();
         State XTTState = new State();
         try {
@@ -132,5 +118,5 @@ public class RuleConfigurator {
         } catch (ModelBuildingException e) {
             e.printStackTrace();
         }
-    }
-}
+    }*/
+}}
