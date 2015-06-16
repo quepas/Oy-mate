@@ -1,12 +1,12 @@
-import heart.*;
-import heart.alsvfd.Formulae;
+import heart.Configuration;
+import heart.HeaRT;
+import heart.State;
+import heart.StateElement;
 import heart.alsvfd.Null;
 import heart.alsvfd.SimpleNumeric;
 import heart.exceptions.*;
 import heart.parser.hmr.HMRParser;
 import heart.parser.hmr.runtime.SourceFile;
-import heart.xtt.Decision;
-import heart.xtt.Rule;
 import heart.xtt.Table;
 import heart.xtt.XTTModel;
 import org.apache.commons.csv.CSVFormat;
@@ -19,7 +19,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Created by Quepas on 2015-06-16.
@@ -74,15 +73,13 @@ public class MetaAttrMatcher {
                 }
             }
         }
-        for(Table table : tables){
-            for (int i = 0; i < csvAttributes.size(); ++i) {
+        for (int i = 0; i < csvAttributes.size(); ++i) {
                 String attr = csvAttributes.get(i);
                 Double value = csvValues.get(i);
                 StateElement stateElement = new StateElement();
                 stateElement.setAttributeName(attr);
                 stateElement.setValue(new SimpleNumeric(value));
                 XTTState.addStateElement(stateElement);
-            }
         }
     }
 
