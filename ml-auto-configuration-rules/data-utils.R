@@ -8,3 +8,7 @@ rbind.left <- function(dataSet1, dataSet2) {
 rbind.right <- function(dataSet1, dataSet2) {
   rbind.left(dataSet2, dataSet1)
 }
+
+EvalExpression <- function(expression) {
+  eval(parse(text = expression))
+}
