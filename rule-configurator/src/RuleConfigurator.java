@@ -20,7 +20,7 @@ public class RuleConfigurator {
         List<String> conclusions = metaAttrMatcher.inferenceAll();
         try {
             FileWriter fileWriter = new FileWriter("predictions.csv");
-            fileWriter.write("did;algorithm\n");
+            fileWriter.write("did,algorithm\n");
             for (String entry : conclusions) {
                 fileWriter.write(entry + "\n");
                 System.out.println(entry);

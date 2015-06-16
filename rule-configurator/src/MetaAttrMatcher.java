@@ -118,7 +118,7 @@ public class MetaAttrMatcher {
         List<String> conclusions = new ArrayList<String>();
         for (Long id : allID) {
             InitState(id);
-            conclusions.add(id + ";" + Inference());
+            conclusions.add(id + "," + Inference());
         }
         return conclusions;
     }
