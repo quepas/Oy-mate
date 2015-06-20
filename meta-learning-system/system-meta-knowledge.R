@@ -24,3 +24,20 @@ GenerateMetaAttributes <- function(meta.attr.coverage,
   }
   meta.attr
 }
+
+ListNTopUsedAlgorithms <- function(N, task.evaluations = envTaskEvaluation, algorithm.regexp = "^weka.*$") {
+  # Listing top N used algorithms
+  #
+  # Args:
+  #   N: Number of algorithms to return [integer]
+  #   task.evaluations: Task results [data.frame]
+  #   algorithm.regexp: Regexp for algorithm name signature [character]
+  #
+  # Returns:
+  #   Sorted (desc) algorithms with usage counter [data.frame]
+  impl <- task.evaluations$implementation
+  impl <- impl[grepl(algorithm.regexp, impl)]
+  impl <- sub("\\(.*\\)", "", impl)
+  impl <- sort(table(impl), decreasing = TRUE)
+  head(data.frame(algorithm = names(impl), count = impl, row.names = c()), N)
+}
