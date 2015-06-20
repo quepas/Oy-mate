@@ -45,17 +45,17 @@ DownloadOpenMLDatasets <- function(dataset.status = c("active")) {
   listOMLDataSets(status = dataset.status)
 }
 
-DownloadOpenMLTaskResults <- function(task.id.list) {
-  # Download learning results for given tasks.
+DownloadOpenMLTaskEvaluation <- function(task.id.list) {
+  # Download learning evaluation for given tasks.
   #
   # Args:
   #   task.id.list: Vector of task identificators [Vector:integer]
   #
   # Returns:
-  #   Learning results [data.frame]
-  task.results <- data.frame()
+  #   Learning evaluation [data.frame]
+  task.evaluation <- data.frame()
   for (id in task.id.list) {
-    task.results <- rbind.fill(task.results, listOMLRunResults(id))
+    task.evaluation <- rbind.fill(task.evaluation, listOMLRunResults(id))
   }
-  task.results
+  task.evaluation
 }
