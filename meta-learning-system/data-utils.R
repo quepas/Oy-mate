@@ -5,11 +5,11 @@ rbind.fill.left <- function(dataset.left, dataset.right) {
   #   left columns, filling missing right columns with 'NA'.
   #
   # Args:
-  #   dataset.a: Base dataset [data.frame]
-  #   dataset.b: Dataset to join [data.frame]
+  #   dataset.a: Left, base dataset [data.frame]
+  #   dataset.b: Right dataset to join [data.frame]
   #
   # Returns:
-  #   Extended base dataset.a [data.frame]
+  #   Extended, filled left dataset.a [data.frame]
   result <- rbind.fill(dataset.left, dataset.right)
   result[, names(dataset.left)]
 }

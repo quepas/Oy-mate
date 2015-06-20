@@ -10,10 +10,10 @@ DownloadOpenMLTasks <- function(type.name = "Supervised Classification") {
   #   OpenML's tasks [data.frame]
   type.list <- listOMLTaskTypes()
   type.id <- with(type.list, id[name == type.name])
-  listOMLTasks(type = type.id)  
+  listOMLTasks(type = type.id)
 }
 
-DownloadOpenMLMetaAttributes <- function(id.list) {
+DownloadOpenMLMetaAttributes <- function(dataset.id.list) {
   # Download OpenML meta attributes of datasets with given IDs.
   #
   # Args:
@@ -21,10 +21,41 @@ DownloadOpenMLMetaAttributes <- function(id.list) {
   #
   # Returns:
   #   Meta attributes [data.frame]
-  qualities <- data.frame()
-  for (id in id.list) {
-    row <- PrepareDataSetQualities(id, listOMLDataSetQualities(id))
-    qualities <- rbind.fill(qualities, row)
+  meta.attributes <- data.frame()
+  for (id in dataset.id.list) {
+    qualities <- listOMLDataSetQualities(id)
+    names <- c("did", qualities[[1]])
+    values <- c(id, qualities[[2]])
+    entry <- data.frame(matrix(dat = NA, ncol = length(names), nrow = 0))
+    colnames(entry) <- names
+    entry[1, ] <- values
+    meta.attributes <- rbind.fill(meta.attributes, entry)
   }
-  qualities
+  meta.attributes
+}
+
+DownloadOpenMLDatasets <- function(dataset.status = c("active")) {
+  # Download all dataset with "active" status.
+  #
+  # Args:
+  #   dataset.status: status of downloaded datasets [Vector:string(active|deactivated|in_preparation)]
+  #
+  # Returns:
+  #   Datasets [data.frame]
+  listOMLDataSets(status = dataset.status)
+}
+
+DownloadOpenMLTaskResults <- function(task.id.list) {
+  # Download learning results for given tasks.
+  #
+  # Args:
+  #   task.id.list: Vector of task identificators [Vector:integer]
+  #
+  # Returns:
+  #   Learning results [data.frame]
+  task.results <- data.frame()
+  for (id in task.id.list) {
+    task.results <- rbind.fill(task.results, listOMLRunResults(id))
+  }
+  task.results
 }
