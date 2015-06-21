@@ -1,5 +1,7 @@
 library(OpenML)
 
+source('data-utils.R')
+
 DownloadOpenMLTasks <- function(type.name = "Supervised Classification") {
   # Download OpenML tasks with given type.
   #
@@ -58,4 +60,19 @@ DownloadOpenMLTaskEvaluation <- function(task.id.list) {
     task.evaluation <- rbind.fill(task.evaluation, listOMLRunResults(id))
   }
   task.evaluation
+}
+
+DownloadOpenMLResources <- function(username = "openml.rteam@gmail.com", password = "testpassword", only.meta.evaluations = FALSE) {
+  session.hash <<- authenticateUser(username, password)
+  if (!only.meta.evaluations) {
+    envDatasets <<- DownloadOpenMLDatasets()
+    envMetaAttributes <<- DownloadOpenMLMetaAttributes(envDatasets$did)
+    envTasks <<- DownloadOpenMLTasks()
+  } else {
+    # uncomment needed part
+    #envTaskEvaluations <<- DownloadOpenMLTaskEvaluation(task.id.list = envTasks[1:500, ]$task_id)
+    #envTaskEvaluations <<- rbind(envTaskEvaluations, DownloadOpenMLTaskEvaluation(task.id.list = envTasks[501:1000, ]$task_id))
+    #envTaskEvaluations <<- rbind(envTaskEvaluations, DownloadOpenMLTaskEvaluation(task.id.list = envTasks[1001:1500, ]$task_id))
+    envTaskEvaluations <<- rbind(envTaskEvaluations, DownloadOpenMLTaskEvaluation(task.id.list = envTasks[1501:1729, ]$task_id))
+  }
 }
