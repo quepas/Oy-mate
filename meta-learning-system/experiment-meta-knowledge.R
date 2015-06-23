@@ -18,10 +18,3 @@ ClassicBuild <- function() {
   }
   BuildMetaRules(hmr.file = "ClassicBuild.hmr", meta.knowledge = meta.knowledge)
 }
-
-CheckBuild <- function(build) {
-  classifier <- J48(class ~ ., data = build, control = Weka_control(U = TRUE))
-  print(classifier)
-  print(evaluate_Weka_classifier(classifier, numFolds = 10))
-  classifier
-}
