@@ -1,3 +1,8 @@
+library(RWeka)
+
+source('system-hmr-generator.R')
+source('system-weka-extractor.R')
+
 BuildMetaRules <- function(hmr.file, meta.knowledge, hmr.directory = "meta-rules/") {
   tree <- BuildRuleBase(meta.knowledge)
   rules <- ParseRWekaTree(tree)
@@ -10,4 +15,8 @@ BuildRuleBase <- function(build) {
   print(classifier)
   print(evaluate_Weka_classifier(classifier, numFolds = 10))
   classifier
+}
+
+GenerateMetaAttributesCSV <- function(file.name, meta.attributes = envMetaAttributes) {
+  write.csv(meta.attributes, file.name, row.names = FALSE)
 }

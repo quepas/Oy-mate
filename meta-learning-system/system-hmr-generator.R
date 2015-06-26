@@ -1,5 +1,3 @@
-library(RWeka)
-
 "xattr [name: class_attr,
        abbrev: class_attr,
        class: simple,
