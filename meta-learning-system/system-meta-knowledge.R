@@ -17,7 +17,7 @@ GenerateMetaAttributes <- function(meta.attr.coverage,
   #   Generated meta-attributes
   meta.attr.count = nrow(meta.attr)
   meta.attr.covered <- sapply(meta.attr, function(x) {
-    sum(!is.na(x))/meta.attr.count > meta.attr.coverage
+    sum(!is.na(x))/meta.attr.count >= meta.attr.coverage
   })
   meta.attr <- meta.attr[, meta.attr.covered]
   if (meta.attr.fill) {
