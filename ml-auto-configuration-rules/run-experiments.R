@@ -65,10 +65,12 @@ SecondExperiment <- function(algoCriteria, runsCriteria, outputFile) {
 
 RunExperiment <- function() {
   dataSet <- data.frame()
-  algorithms <- CreateAlgorithmsFrame() #CreateAlgorithmsFrameAll()
-  goodRuns <- globalResults[globalResults$area.under.roc.curve >= 0.98, ]
+  algorithms <- GetTopNAlgorithms(2)#CreateAlgorithmsFrame() #CreateAlgorithmsFrameAll()
+  goodRuns <- globalResults[globalResults$area.under.roc.curve >= 0.9, ]
  # goodRuns <- globalResults[globalResults$predictive.accuracy >= 0.8, ]
-
+  
+  filledGlobalQualities <- FastImputation(globalQualities[, -(25:73)], TrainFastImputation(globalQualities[, -(25:73)]))
+ 
   for (i in 1:nrow(algorithms)) {
     algoRuns <- subset(goodRuns, grepl(algorithms$openmlName[i], implementation))
     tasks <- algoRuns$task.id
@@ -76,16 +78,17 @@ RunExperiment <- function() {
     did <- globalTasks[globalTasks$task_id %in% tasks, "did"]
     #print(did)
     #data <- globalQualities[globalQualities$did %in% did, -1]
-    data <- globalQualities[globalQualities$did %in% did, ]
+    data <- filledGlobalQualities[filledGlobalQualities$did %in% did, ]
+   # dataSet <- FastImputation(dataSet, TrainFastImputation(dataSet))
     classes <- data.frame(class=rep(algorithms$name[i], nrow(data)))
     dataSet <- rbind(dataSet, data.frame(data, classes))
   }
   #dataSet <- RemoveMissingColumns(dataSet, 0.6)
   #dataSet <- RemoveMissingRows(dataSet, 0.5)
-  dataSet <- UniqueDataSetSampling(dataSet)
+  #dataSet <- UniqueDataSetSampling(dataSet)
   dataSet <- dataSet[, -1]
   dataSet <- FillNA(dataSet)
-  SaveARFF(dataSet, "DataSetNewTestAll", generatedDatasetDir)
+  SaveARFF(dataSet, "MetaRules50ROC98ver2", generatedDatasetDir)
   dataSet
 }
 
@@ -122,7 +125,14 @@ RunRankingExperiment <- function() {
 GenerateMLAutoconfRules <- function() {
   dataset <- RunExperiment();
   classifier <- J48(class ~ ., data = dataset)
+  print(classifier)
+  print(evaluate_Weka_classifier(classifier, numFolds = 10))
   rules <- ParseRWekaTree(classifier)
   hmr <- GenerateHMR(rules, dataset)
   write(hmr, file = "rule.hmr")
+}
+
+GenerateDatasetQualitiesCSV <- function() {
+  filled <- FillNA(globalQualities)
+  write.csv(filled, "qualities.csv", row.names = FALSE)
 }
